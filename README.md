@@ -10,8 +10,9 @@ Real-time weather for Oulu, Finland.
 
 ## Potential plans
 - More data about the weather
-- Better looking icons
-- Better error handling.
+- Better looking icons to improve the user experience
+- Better error handling on api call errors; Let the user know what's going on when error occurs.
+- Weather data about different locations, instead of just one. For example a search option for the user.
 
 ## Getting started
 

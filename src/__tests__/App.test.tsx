@@ -1,26 +1,11 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import App from "../App"
-
-test('demo', () => {
-    expect(true).toBe(true)
-})
+import App from '../App';
 
 /* 
-    Mock function for fetch
+    Mock the fetch function
 */
-const mockFetch = jest.fn(() =>
-    Promise.resolve({
-        json: () => Promise.resolve(mockData),
-        headers: { get: () => 'application/json' },
-        ok: true,
-        redirected: false,
-        status: 200,
-        statusText: 'OK',
-    }) as unknown as Response
-);
-
-(global as any).fetch = mockFetch;
+global.fetch = jest.fn();
 
 
 /* 
@@ -49,14 +34,23 @@ const mockData = {
     },
 };
 
+
+/* 
+    Setup fetch mock
+*/
+const setupFetchMock = (data = mockData) => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+        json: jest.fn().mockResolvedValue(data),
+    });
+};
+
 describe('Weather App Tests', () => {
     beforeEach(() => {
-        (global.fetch as jest.Mock).mockClear();
-        (global.fetch as jest.Mock) = jest.fn(() =>
-        Promise.resolve({
-                json: () => Promise.resolve(mockData),
-            }) as unknown as Response
-        );
+        setupFetchMock();
+    });
+
+    test('demo', () => {
+        expect(true).toBe(true);
     });
 
     test('renders the app with default data', async () => {
@@ -86,6 +80,22 @@ describe('Weather App Tests', () => {
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalled();
+        });
+    });
+
+    test('fetches data and updates state', async () => {
+        render(<App />);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                'https://api.open-meteo.com/v1/forecast?latitude=65.01&longitude=25.47&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m&wind_speed_unit=ms&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&temperature_unit=celsius',
+                expect.any(Object)
+            );
+
+            expect(screen.getByText(/Current weather/i)).toBeInTheDocument();
+            expect(screen.getByText(/Weekly highlight/i)).toBeInTheDocument();
+            expect(screen.getByText(/Hourly chart/i)).toBeInTheDocument();
+
         });
     });
 });
