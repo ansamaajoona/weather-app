@@ -8,6 +8,10 @@ Real-time weather for Oulu, Finland.
 - Next 7 days weather
 - Option to choose temperature unit
 
+## Potential plans
+- More data about the weather
+- Better looking icons
+- Better error handling.
 
 ## Getting started
 
